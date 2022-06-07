@@ -6,5 +6,7 @@ Replication materials for Schools as a Safety-net: The Impact of School Closures
   ├─ data: containg the XXXX.dta
   ├─ graphs: folder to save the figures
   ├─ reg: folder to save .tex files
-  └─ source: folder that contains .do file
+  └─ source: folder to save .do files
+     ├─ SchoolClosureMainResults.do: to replicate the main results
+     └─ XXXX.do: to replicate the results of the Supplementary Information
 ```
