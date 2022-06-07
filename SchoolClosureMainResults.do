@@ -22,7 +22,7 @@ set more off
 *-------------------------------------------------------------------------------
 *Global and some details
 *-------------------------------------------------------------------------------
-global ROOT "C:/Users/danie/OneDrive/Escritorio/Research/SchoolClosureViolence/replication/"
+global ROOT ""
 
 global DAT "$ROOT/data"
 global GRA "$ROOT/results/graphs"
@@ -660,10 +660,7 @@ foreach v of local variables {
 
 	local c1
 	local c2 schoolVar1
-	
 	keep if week<=156
-	*tempfile CounterfactualData
-	*save `CounterfactualData'
  
 	*keep dates for bounds
 	preserve
@@ -687,11 +684,9 @@ foreach v of local variables {
 		local td pre_t pre_t2
 	}
 	
-	*use `CounterfactualData' , clear
 	qui keep if year>=2018
 	local cond2 "[aw=populationyoung]"
 			
-	*main code
 	*Baseline
 	cap drop weekpre ratehat*
 	gen weekpre = w
@@ -710,22 +705,22 @@ foreach v of local variables {
 		rename t2 pre_t2
 	predict ratehat1
 	
-	*(3) School Open
+	*(2) School Open
 	cap drop _week*
 	qui tab weekpre, gen(_week)
 	drop _week54
-		rename pre_t t
-		rename pre_t2 t2
-		rename Xpre_t pre_t
-		rename Xpre_t2 pre_t2
+	rename pre_t t
+	rename pre_t2 t2
+	rename Xpre_t pre_t
+	rename Xpre_t2 pre_t2
 	
 	areg `v' _week* `c2' `td' `cond2', `opt2'
 	drop _week*
 	qui tab w, gen(_week)
-		rename pre_t Xpre_t
-		rename pre_t2 Xpre_t2
-		rename t pre_t 
-		rename t2 pre_t2
+	rename pre_t Xpre_t
+	rename pre_t2 Xpre_t2
+	rename t pre_t 
+	rename t2 pre_t2
 	predict ratehat2
 	drop _week*
 	
@@ -760,7 +755,6 @@ foreach v of local variables {
 			bsample , cluster(comuna) idcluster(com2)
 			qui tab weekpre, gen(_week)
 			drop _week54
-					
 			rename pre_t t
 			rename pre_t2 t2
 			rename Xpre_t pre_t
@@ -768,8 +762,7 @@ foreach v of local variables {
 					
 			qui areg `v' _week* `c`j'' `td' `cond2', cluster(com2) abs(com2)
 			drop _week*
-			qui tab w, gen(_week)
-									
+			qui tab w, gen(_week)				
 			rename pre_t Xpre_t
 			rename pre_t2 Xpre_t2
 			rename t pre_t 
@@ -1073,20 +1066,4 @@ foreach v of local variables {
 	graph save   "$GRA/C3_`en'_2018_`tr'.gph", replace;
 	#delimit cr				
 }	
-						
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-	
-	
-
-
-
 
