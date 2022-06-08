@@ -22,7 +22,7 @@ set more off
 *-------------------------------------------------------------------------------
 *Global and some details
 *-------------------------------------------------------------------------------
-global ROOT "replication/"
+global ROOT "/replication/"
 
 global DAT "$ROOT/data"
 global GRA "$ROOT/results/graphs"
@@ -884,154 +884,143 @@ foreach v of local variables {
         }
 				
         if "`v'"=="rate" {
-			sum diffvar1 if R01==22635
-			local yyc1=r(mean)
-			sum area2 if R01==22635
-			local yyc2=r(mean)
-			sum area3 if R01==22635
-			local yyc3=r(mean)
-			sum area4 if R01==22635
-			local yyc4=r(mean)
-			sum area5 if R01==22635
-			local yyc5=r(mean)
-			local ylabels -350(250)1550
-			local cord1 1650 22018
-			local cord2 1650 22196
-			local ycord1 `yyc1' 22700
-			local ycord2 `yyc2' 22700
-			local ycord3 `yyc3' 22700
-			local ycord4 `yyc4' 22700
-			local ycord5 `yyc5' 22700
-			local tr lineal
+            qui sum diffvar1 if R01==22635
+            local yyc1=r(mean)
+            qui sum area2 if R01==22635
+            local yyc2=r(mean)
+            qui sum area3 if R01==22635
+            local yyc3=r(mean)
+            qui sum area4 if R01==22635
+            local yyc4=r(mean)
+            qui sum area5 if R01==22635
+            local yyc5=r(mean)
+            local ylabels -350(250)1550
+            local cord1 1650 22018
+            local cord2 1650 22196
+            local ycord1 `yyc1' 22700
+            local ycord2 `yyc2' 22700
+            local ycord3 `yyc3' 22700
+            local ycord4 `yyc4' 22700
+            local ycord5 `yyc5' 22700
+            local tr lineal
         }
 		if "`v'"=="rateSA" {
-			sum diffvar1 if R01==22614
-			local yyc1=r(mean)
-			sum area2 if R01==22614
-			local yyc2=r(mean)
-			sum area3 if R01==22614
-			local yyc3=r(mean)
-			sum area4 if R01==22614
-			local yyc4=r(mean)
-			sum area5 if R01==22614
-			local yyc5=r(mean)
-			local ylabels -150(200)1300
-			local cord1 1200 22018
-			local cord2 1200 22196
-			local ycord1 `yyc1' 22670
-			local ycord2 `yyc2' 22670
-			local ycord3 `yyc3' 22670
-			local ycord4 `yyc4' 22670
-			local ycord5 `yyc5' 22670
-			local tr cuadratic
+            qui sum diffvar1 if R01==22614
+            local yyc1=r(mean)
+            qui sum area2 if R01==22614
+            local yyc2=r(mean)
+            qui sum area3 if R01==22614
+            local yyc3=r(mean)
+            qui sum area4 if R01==22614
+            local yyc4=r(mean)
+            qui sum area5 if R01==22614
+            local yyc5=r(mean)
+            local ylabels -150(200)1300
+            local cord1 1200 22018
+            local cord2 1200 22196
+            local ycord1 `yyc1' 22670
+            local ycord2 `yyc2' 22670
+            local ycord3 `yyc3' 22670
+            local ycord4 `yyc4' 22670
+            local ycord5 `yyc5' 22670
+            local tr cuadratic
 		}
 		if "`v'"=="rateV" {
-			sum diffvar1 if R01==22614
-			local yyc1=r(mean)
-			sum area2 if R01==22614
-			local yyc2=r(mean)
-			sum area3 if R01==22614
-			local yyc3=r(mean)
-			sum area4 if R01==22614
-			local yyc4=r(mean)
-			sum area5 if R01==22614
-			local yyc5=r(mean)
-			local ylabels -50(25)225
-			local cord1 210 22018
-			local cord2 210 22196
-			local ycord1 `yyc1' 22670
-			local ycord2 `yyc2' 22670
-			local ycord3 `yyc3' 22670
-			local ycord4 `yyc4' 22670
-			local ycord5 `yyc5' 22670
-			local tr cuadratic
+            qui sum diffvar1 if R01==22614
+            local yyc1=r(mean)
+            qui sum area2 if R01==22614
+            local yyc2=r(mean)
+            qui sum area3 if R01==22614
+            local yyc3=r(mean)
+            qui sum area4 if R01==22614
+            local yyc4=r(mean)
+            qui sum area5 if R01==22614
+            local yyc5=r(mean)
+            local ylabels -50(25)225
+            local cord1 210 22018
+            local cord2 210 22196
+            local ycord1 `yyc1' 22670
+            local ycord2 `yyc2' 22670
+            local ycord3 `yyc3' 22670
+            local ycord4 `yyc4' 22670
+            local ycord5 `yyc5' 22670
+            local tr cuadratic
 		}
 								
         #delimit ;
-		tw area diffvar1 R01, lc(black) color("253 231 37%50") || 
-		   rarea diffvar1 area2 R01,  color("93 201 99%50") || 
-		   rarea area2 diffvar1_20 R01, color("33 144 140%50") || 
-		   rarea area3 diffvar1_30 R01, color("59 82 139%50") || 
-		   rarea area4 diffvar1_40 R01, color("68 1 84%50") || 
-			   if R01>=21550 & R01<22642 & R01>21984, ytitle("Difference")
-			   yline(0, lc(red) lp(dash)) ttitle("")
-			   xline(21984 22145, lc(red) lp(solid) lw(0.4))
-			   tlabel(#14, angle(45)) ylabel(`ylabels', angle(0))  
-			   legend(order(1 "Observed" 2 "{&Delta}10%" 3 "{&Delta}20%"
-							4 "{&Delta}30%" 5 "{&Delta}40%") pos(6) col(5))
-			   text(`cord1' "School" "Close")
-			   text(`cord2' "School" "Reopening") 
-			   text(`ycord1' "Diff = `sumd1'") 
-			   text(`ycord2' "Diff = `sumd2'") 
-			   text(`ycord3' "Diff = `sumd3'") 
-			   text(`ycord4' "Diff = `sumd4'") 
-			   text(`ycord5' "Diff = `sumd5'") 
-			   graphregion(margin(r=18 t=8));
-		graph export "$GRA/diff_Count_`n'_`en'_2018_`tr'.pdf", replace;
+        tw area diffvar1 R01, lc(black) color("253 231 37%50")  || 
+            rarea diffvar1 area2 R01,  color("93 201 99%50")    || 
+            rarea area2 diffvar1_20 R01, color("33 144 140%50") || 
+            rarea area3 diffvar1_30 R01, color("59 82 139%50")  || 
+            rarea area4 diffvar1_40 R01, color("68 1 84%50")    || 
+            if R01>=21550 & R01<22642 & R01>21984, ytitle("Difference")
+            yline(0, lc(red) lp(dash)) ttitle("")
+            xline(21984 22145, lc(red) lp(solid) lw(0.4))
+            tlabel(#14, angle(45)) ylabel(`ylabels', angle(0))  
+            legend(order(1 "Observed" 2 "{&Delta}10%" 3 "{&Delta}20%"
+                         4 "{&Delta}30%" 5 "{&Delta}40%") pos(6) col(5))
+            text(`cord1' "School" "Close") text(`cord2' "School" "Reopening") 
+            text(`ycord1' "Diff = `sumd1'") text(`ycord2' "Diff = `sumd2'") 
+            text(`ycord3' "Diff = `sumd3'") text(`ycord4' "Diff = `sumd4'") 
+            text(`ycord5' "Diff = `sumd5'") graphregion(margin(r=18 t=8));
+        graph export "$GRA/diff_Count_`n'_`en'_2018_`tr'.pdf", replace;
         graph save "$GRA/diff_Count_`n'_`en'_2018_`tr'.gph", replace;
-		#delimit cr
-		local ++n				
-	}
+        #delimit cr
+        local ++n				
+    }
 				
-	sort R01
-	*Baseline graph
-	local i1 "if R01>=21550 & R01<22642"
-	local i2 "if R01>=21984 & R01<22642"
+    sort R01
+    *Baseline graph
+    local i1 "if R01>=21550 & R01<22642"
+    local i2 "if R01>=21984 & R01<22642"
 				
-	if "`v'"=="rate" {
-		local cord1 2100 22065
-		local cord2 2100 22340
-		local ylabels 600(200)2200
-		local tr lineal
-	}
-	if "`v'"=="rateSA" {
-		local cord1 1500 22065
-		local cord2 1500 22340
-		local ylabels 400(200)1600
-		local tr cuadratic
-	}
-	if "`v'"=="rateV" {
-		local cord1 325 22065
-		local cord2 325 22340
-		local ylabels 100(50)350
-		local tr cuadratic
-	}
+    if "`v'"=="rate" {
+        local cord1 2100 22065
+        local cord2 2100 22340
+        local ylabels 600(200)2200
+    }
+    if "`v'"=="rateSA" {
+        local cord1 1500 22065
+        local cord2 1500 22340
+        local ylabels 400(200)1600
+    }
+    if "`v'"=="rateV" {
+        local cord1 325 22065
+        local cord2 325 22340
+        local ylabels 100(50)350
+    }
 					
-	#delimit ;
-	twoway line R11 R01 `i1', lc(gs6) lp(solid)
-	|| rarea Rlb Rub R01 `i2', color(gs8%40) fcol(gs8%40) fi(gs8%40)
-	|| line R21 R01 `i1', lc(blue) lp(solid)
-		   xline(21984 22145, lc(red) lp(solid))
-		   xtitle("") ytitle("Criminal Report per 100,000")
-		   ylabel(`ylabels') xlabel(#13, angle(45))
-		   legend(order(1 "Actual Values"
-						3 "Counterfactual (time only)") pos(6) col(3))
-		   text(`cord1' "Under-reporting" "(closure)" "`tot1_1'" "[`tot1_1_lb'-`tot1_1_ub']",
-				size(2.5) box bc(dkgreen%30) fc(dkgreen%30) lc(dkgreen%30) bexpand bmargin(b+2))
-		   text(`cord2' "Under-reporting" "(re-opening)" "`tot1_2'" "[`tot1_2_lb'-`tot1_2_ub']",
-				size(2.5) box bc(dkgreen%30) fc(dkgreen%30) lc(dkgreen%30) bexpand bmargin(b+2))
-		   note("RMSPE = `rmse1'");
-	graph export "$GRA/C1_`en'_2018_`tr'.pdf", replace;
-	graph save   "$GRA/C1_`en'_2018_`tr'.gph", replace;
-	#delimit cr
-				
-	#delimit ;
-	twoway line R11 R01 `i1', lc(gs6) lp(solid) 
-	|| rarea Tlb Tub R01 `i2', color(gs8%40) fcol(gs8%40) fi(gs8%40)
-	|| line T21 R01 `i1', lc(blue) lp(solid) 
-		   xline(21984 22145, lc(red) lp(solid)) 
-		   xtitle("") ytitle("Criminal Report per 100,000")
-		   ylabel(`ylabels') xlabel(#13, angle(45))
-		   legend(order(1 "Actual Values" 
-						3 "Counterfactual (school controls)") pos(6) col(3))
-		   text(`cord1' "Under-reporting" "(closure)" "`tot2_1'" "[`tot2_1_lb'-`tot2_1_ub']",
-				size(2.5) box bc(dkgreen%30) fc(dkgreen%30) lc(dkgreen%30) bexpand bmargin(b+2))
-		   text(`cord2' "Under-reporting" "(re-opening)" "`tot2_2'" "[`tot2_2_lb'-`tot2_2_ub']",
-				size(2.5) box bc(dkgreen%30) fc(dkgreen%30) lc(dkgreen%30) bexpand bmargin(b+2))
-		   note("RMSPE = `rmse3'");
-	graph export "$GRA/C3_`en'_2018_`tr'.pdf", replace;
-	graph save   "$GRA/C3_`en'_2018_`tr'.gph", replace;
-	#delimit cr				
+    #delimit ;
+    twoway line R11 R01 `i1', lc(gs6) lp(solid)
+        || rarea Rlb Rub R01 `i2', color(gs8%40) fcol(gs8%40) fi(gs8%40)
+        || line R21 R01 `i1', lc(blue) lp(solid) 
+    xline(21984 22145, lc(red) lp(solid)) ytitle("Criminal Report per 100,000")
+    ylabel(`ylabels') xlabel(#13, angle(45)) xtitle("")
+    legend(order(1 "Actual Values" 3 "Counterfactual (time only)") pos(6) col(3))
+    text(`cord1' "Under-reporting" "(closure)" "`tot1_1'" "[`tot1_1_lb'-`tot1_1_ub']",
+         size(2.5) box bc(dkgreen%30) fc(dkgreen%30) lc(dkgreen%30) bexpand bmargin(b+2))
+    text(`cord2' "Under-reporting" "(re-opening)" "`tot1_2'" "[`tot1_2_lb'-`tot1_2_ub']",
+         size(2.5) box bc(dkgreen%30) fc(dkgreen%30) lc(dkgreen%30) bexpand bmargin(b+2))
+    note("RMSPE = `rmse1'");
+    graph export "$GRA/C1_`en'_2018_`tr'.pdf", replace;
+    graph save   "$GRA/C1_`en'_2018_`tr'.gph", replace;
+
+
+    twoway line R11 R01 `i1', lc(gs6) lp(solid) 
+        || rarea Tlb Tub R01 `i2', color(gs8%40) fcol(gs8%40) fi(gs8%40)
+        || line T21 R01 `i1', lc(blue) lp(solid) 
+    xline(21984 22145, lc(red) lp(solid)) 
+    xtitle("") ytitle("Criminal Report per 100,000")
+    ylabel(`ylabels') xlabel(#13, angle(45))
+    legend(order(1 "Actual Values" 3 "Counterfactual (school controls)") pos(6) col(3))
+    text(`cord1' "Under-reporting" "(closure)" "`tot2_1'" "[`tot2_1_lb'-`tot2_1_ub']",
+         size(2.5) box bc(dkgreen%30) fc(dkgreen%30) lc(dkgreen%30) bexpand bmargin(b+2))
+    text(`cord2' "Under-reporting" "(re-opening)" "`tot2_2'" "[`tot2_2_lb'-`tot2_2_ub']",
+         size(2.5) box bc(dkgreen%30) fc(dkgreen%30) lc(dkgreen%30) bexpand bmargin(b+2))
+    note("RMSPE = `rmse3'");
+    graph export "$GRA/C3_`en'_2018_`tr'.pdf", replace;
+    graph save   "$GRA/C3_`en'_2018_`tr'.gph", replace;
+    #delimit cr				
 }	
 
 
