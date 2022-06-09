@@ -13,7 +13,7 @@
 		- OUT: for save .tex files
 		- source: folder that contains this .do file
 		
-	requirements: we use the plotplainblind scheme (ssc instal plotplainblind), 
+	requirements: we use the plotplainblind scheme (ssc install plotplainblind), 
 	so if you want to change this to another scheme, just change line 30.
 */
 clear all
@@ -677,15 +677,267 @@ graph export "$GRA/kden_bylvl.eps", replace;
 
 
 
-*-------------------------------------------------------------------------------
-*Figure S19-S23
-*-------------------------------------------------------------------------------
+
 *-------------------------------------------------------------------------------
 *Figure S24-S25
 *-------------------------------------------------------------------------------
+*DV: S24
+import excel "$DAT/SchoolClosureCounterfactual", clear firstrow sheet(VIF_1)
+gen orden1=-_n
+gen x1=-500 //axis for rmse
+gen l=-500
+gen u=2600
+gen orden2=-9.5 //indicate minimun rmse
+replace orden2=-10.5 if orden1==-15
+
+#delimit ;
+tw rarea l u orden2, hor color(gs14) fcol(gs14) fi(gs14)
+    || rcap lower1 upper1 orden1 if min==0, hor 
+    || rcap lower1 upper1 orden1 if min==1, hor lc(black)
+    || pci -1 0 -15.5 0, lp(dash) lc(red)
+    || scatter orden1 beta1, ms(C)     
+    || scatter orden1 x1 if beta1!=. , 
+mlabel(RMSE) ms(none) legend(off) ytitle("") xlabel(-200(200)2600, nogrid) 
+yticks() yline(-1 -6  -11, ext lp(solid) lc(gs10)) text(-0.5 -310 "RMSPE")
+ylab(-1 "{bf:Quadratic}" -2 "2015" -3 "2016" -4 "2017" -5 "2018" -6 "{bf:Linear}"
+     -7 "2015" -8 "2016" -9 "2017" -10 "2018" -11 "{bf:No Trend}" -12 "2015"
+     -13 "2016" -14 "2017" -15 "2018", nogrid);
+graph export "$GRA/VIF_1_before.eps", replace;
+#delimit cr
+
+replace x1=-2500
+replace l=-2500
+replace u=6500
+
+#delimit ;
+tw rarea l u orden2, hor color(gs14) fcol(gs14) fi(gs14)
+    || rcap lower2 upper2 orden1 if min==0, hor 
+    || rcap lower2 upper2 orden1 if min==1, hor lc(black)
+    || pci -1 0 -15.5 0, lp(dash) lc(red)
+    || scatter orden1 beta2, ms(C)     
+    || scatter orden1 x1 if beta1!=. , 
+mlabel(RMSE) ms(none) legend(off) ytitle("") xlabel(-1000(1000)6500, nogrid) 
+yticks() yline(-1 -6 -11, ext lp(solid) lc(gs10)) text(-0.5 -2000 "RMSPE")
+ylab(-1 "{bf:Quadratic}" -2 "2015" -3 "2016" -4 "2017" -5 "2018" -6 "{bf:Linear}"
+     -7 "2015" -8 "2016" -9 "2017" -10 "2018" -11 "{bf:No Trend}" -12 "2015"
+     -13 "2016" -14 "2017" -15 "2018", nogrid);
+graph export "$GRA/VIF_1_after.eps", replace;
+#delimit cr
 
 
+*VIF: S25
+import excel "$DAT/SchoolClosureCounterfactual", clear firstrow sheet(VIF_3)
+gen orden1=-_n
+gen x1=-500 //axis for rmse
+gen l=-500 
+gen u=2600
+gen orden2=-14.5 //indicate minimun rmse
+replace orden2=-15.5 if orden1==-15
 
+#delimit ;
+tw rarea l u orden2, hor color(gs14) fcol(gs14) fi(gs14)
+    || rcap lower1 upper1 orden1 if min==0, hor 
+    || rcap lower1 upper1 orden1 if min==1, hor lc(black)
+    || pci -1 0 -15.5 0, lp(dash) lc(red)
+    || scatter orden1 beta1, ms(C)     
+    || scatter orden1 x1 if beta1!=. , 
+mlabel(RMSE) ms(none) legend(off) ytitle("") xlabel(-200(200)2600, nogrid) 
+yticks() yline(-1 -6 -11, ext lp(solid) lc(gs10)) text(-0.5 -310 "RMSPE")
+ylab(-1 "{bf:Quadratic}" -2 "2015" -3 "2016" -4 "2017" -5 "2018" -6 "{bf:Linear}"
+     -7 "2015" -8 "2016" -9 "2017" -10 "2018" -11 "{bf:No Trend}" -12 "2015"
+     -13 "2016" -14 "2017" -15 "2018", nogrid );
+graph export "$GRA/VIF_3_before.eps", replace;
+#delimit cr
 
+replace x1=-2500
+replace l=-2500
+replace u=6500
+
+#delimit ;
+tw rarea l u orden2, hor color(gs14) fcol(gs14) fi(gs14)
+    || rcap lower2 upper2 orden1 if min==0, hor 
+    || rcap lower2 upper2 orden1 if min==1, hor lc(black)
+    || pci -1 0 -15.5 0, lp(dash) lc(red)
+    || scatter orden1 beta2, ms(C)     
+    || scatter orden1 x1 if beta1!=. , 
+mlabel(RMSE) ms(none) legend(off) ytitle("") xlabel(-1000(1000)6500, nogrid) 
+yticks() yline(-1 -6 -11, ext lp(solid) lc(gs10)) text(-0.5 -2000 "RMSPE")
+ylab(-1 "{bf:Quadratic}" -2 "2015" -3 "2016" -4 "2017" -5 "2018" -6 "{bf:Linear}"
+     -7 "2015" -8 "2016" -9 "2017" -10 "2018" -11 "{bf:No Trend}" -12 "2015"
+     -13 "2016" -14 "2017" -15 "2018", nogrid );
+graph export "$GRA/VIF_3_after.eps", replace;
+#delimit cr
+
+*SA: S24
+import excel "$DAT/SchoolClosureCounterfactual", clear firstrow sheet(SA_1)
+gen orden1=-_n
+gen x1=-500 //axis for rmse
+gen l=-500
+gen u=1600
+gen orden2=-4.5 //indicate minimun rmse
+replace orden2=-5.5 if orden1==-15
+
+#delimit ;
+tw rarea l u orden2, hor color(gs14) fcol(gs14) fi(gs14)
+|| rcap lower1 upper1 orden1 if min==0, hor 
+|| rcap lower1 upper1 orden1 if min==1, hor lc(black)
+|| pci -1 0 -15.5 0, lp(dash) lc(red)
+|| scatter orden1 beta1, ms(C)     
+|| scatter orden1 x1 if beta1!=. , 
+mlabel(RMSE) ms(none) legend(off) ytitle("") xlabel(-200(200)1600, nogrid) 
+yticks() yline(-1 -6 -11, ext lp(solid) lc(gs10)) text(-0.5 -380 "RMSPE")
+ylab(-1 "{bf:Quadratic}" -2 "2015" -3 "2016" -4 "2017" -5 "2018" -6 "{bf:Linear}"
+     -7 "2015" -8 "2016" -9 "2017" -10 "2018" -11 "{bf:No Trend}" -12 "2015"
+     -13 "2016" -14 "2017" -15 "2018", nogrid );
+graph export "$GRA/SA_1_before.eps", replace;
+#delimit cr
+
+replace x1=-2500
+replace l=-2500
+replace u=4000
+
+#delimit ;
+tw rarea l u orden2, hor color(gs14) fcol(gs14) fi(gs14)
+    || rcap lower2 upper2 orden1 if min==0, hor 
+    || rcap lower2 upper2 orden1 if min==1, hor lc(black)
+    || pci -1 0 -15.5 0, lp(dash) lc(red)
+    || scatter orden1 beta2, ms(C)     
+    || scatter orden1 x1 if beta1!=. , 
+mlabel(RMSE) ms(none) legend(off) ytitle("") xlabel(-1500(500)4000, nogrid) 
+yticks() yline(-1 -6 -11, ext lp(solid) lc(gs10)) text(-0.5 -2200 "RMSPE")
+ylab(-1 "{bf:Quadratic}" -2 "2015" -3 "2016" -4 "2017" -5 "2018" -6 "{bf:Linear}"
+     -7 "2015" -8 "2016" -9 "2017" -10 "2018" -11 "{bf:No Trend}" -12 "2015"
+     -13 "2016" -14 "2017" -15 "2018", nogrid );
+graph export "$GRA/SA_1_after.eps", replace;
+#delimit cr
+
+*SA: S25
+import excel "$DAT/SchoolClosureCounterfactual", clear firstrow sheet(SA_3)
+gen orden1=-_n
+gen x1=-500 //axis for rmse
+gen l=-500 
+gen u=1600
+gen orden2=-4.5 //indicate minimun rmse
+replace orden2=-5.5 if orden1==-15
+
+#delimit ;
+tw rarea l u orden2, hor color(gs14) fcol(gs14) fi(gs14)
+    || rcap lower1 upper1 orden1 if min==0, hor 
+    || rcap lower1 upper1 orden1 if min==1, hor lc(black)
+    || pci -1 0 -15.5 0, lp(dash) lc(red)
+    || scatter orden1 beta1, ms(C)     
+    || scatter orden1 x1 if beta1!=. , 
+mlabel(RMSE) ms(none) legend(off) ytitle("") xlabel(-200(200)1600, nogrid) 
+yticks() yline(-1 -6 -11, ext lp(solid) lc(gs10)) text(-0.5 -380 "RMSPE")
+ylab(-1 "{bf:Quadratic}" -2 "2015" -3 "2016" -4 "2017" -5 "2018" -6 "{bf:Linear}"
+     -7 "2015" -8 "2016" -9 "2017" -10 "2018" -11 "{bf:No Trend}" -12 "2015"
+     -13 "2016" -14 "2017" -15 "2018", nogrid );
+graph export "$GRA/SA_3_before.eps", replace;
+#delimit cr
+
+replace x1=-2500
+replace l=-2500
+replace u=4000
+
+#delimit ;
+tw rarea l u orden2, hor color(gs14) fcol(gs14) fi(gs14)
+    || rcap lower2 upper2 orden1 if min==0, hor 
+    || rcap lower2 upper2 orden1 if min==1, hor lc(black)
+    || pci -1 0 -15.5 0, lp(dash) lc(red)
+    || scatter orden1 beta2, ms(C)     
+    || scatter orden1 x1 if beta1!=. , 
+mlabel(RMSE) ms(none) legend(off) ytitle("") xlabel(-1500(500)4000, nogrid) 
+yticks() yline(-1 -6 -11, ext lp(solid) lc(gs10)) text(-0.5 -2000 "RMSPE")
+ylab(-1 "{bf:Quadratic}" -2 "2015" -3 "2016" -4 "2017" -5 "2018" -6 "{bf:Linear}"
+     -7 "2015" -8 "2016" -9 "2017" -10 "2018" -11 "{bf:No Trend}" -12 "2015"
+     -13 "2016" -14 "2017" -15 "2018", nogrid );
+graph export "$GRA/SA_3_after.eps", replace;
+#delimit cr
+
+*R: S24
+import excel "$DAT/SchoolClosureCounterfactual", clear firstrow sheet(R_1)
+gen orden1=-_n
+gen x1=-200 //axis for rmse
+gen l=-200
+gen u=250
+gen orden2=-4.5 //indicate minimun rmse
+replace orden2=-5.5 if orden1==-15
+
+#delimit ;
+tw rarea l u orden2, hor color(gs14) fcol(gs14) fi(gs14)
+    || rcap lower1 upper1 orden1 if min==0, hor 
+    || rcap lower1 upper1 orden1 if min==1, hor lc(black)
+    || pci -1 0 -15.5 0, lp(dash) lc(red)
+    || scatter orden1 beta1, ms(C)     
+    || scatter orden1 x1 if beta1!=. , 
+mlabel(RMSE) ms(none) legend(off) ytitle("") xlabel(-150(50)250, nogrid) 
+yticks() yline(-1 -6 -11, ext lp(solid) lc(gs10)) text(-0.5 -180 "RMSPE")
+ylab(-1 "{bf:Quadratic}" -2 "2015" -3 "2016" -4 "2017" -5 "2018" -6 "{bf:Linear}"
+     -7 "2015" -8 "2016" -9 "2017" -10 "2018" -11 "{bf:No Trend}" -12 "2015"
+     -13 "2016" -14 "2017" -15 "2018", nogrid );
+graph export "$GRA/R_1_before.eps", replace;
+#delimit cr
+
+replace x1=-550
+replace l=-550
+replace u=800
+
+#delimit ;
+tw rarea l u orden2, hor color(gs14) fcol(gs14) fi(gs14)
+    || rcap lower2 upper2 orden1 if min==0, hor 
+    || rcap lower2 upper2 orden1 if min==1, hor lc(black)
+    || pci -1 0 -15.5 0, lp(dash) lc(red)
+    || scatter orden1 beta2, ms(C)     
+    || scatter orden1 x1 if beta1!=. , 
+mlabel(RMSE) ms(none) legend(off) ytitle("") xlabel(-400(100)800, nogrid) 
+yticks() yline(-1 -6 -11, ext lp(solid) lc(gs10)) text(-0.5 -480 "RMSPE")
+ylab(-1 "{bf:Quadratic}" -2 "2015" -3 "2016" -4 "2017" -5 "2018" -6 "{bf:Linear}"
+     -7 "2015" -8 "2016" -9 "2017" -10 "2018" -11 "{bf:No Trend}" -12 "2015"
+     -13 "2016" -14 "2017" -15 "2018", nogrid );
+graph export "$GRA/R_1_after.eps", replace;
+#delimit cr
+
+*R: S25
+import excel "$DAT/SchoolClosureCounterfactual", clear firstrow sheet(R_3)
+gen orden1=-_n
+gen x1=-200 //axis for rmse
+gen l=-200
+gen u=250
+gen orden2=-4.5 //indicate minimun rmse
+replace orden2=-5.5 if orden1==-15
+
+#delimit ;
+tw rarea l u orden2, hor color(gs14) fcol(gs14) fi(gs14)
+    || rcap lower1 upper1 orden1 if min==0, hor 
+    || rcap lower1 upper1 orden1 if min==1, hor lc(black)
+    || pci -1 0 -15.5 0, lp(dash) lc(red)
+    || scatter orden1 beta1, ms(C)     
+    || scatter orden1 x1 if beta1!=. , 
+mlabel(RMSE) ms(none) legend(off) ytitle("") xlabel(-150(50)250, nogrid) 
+yticks() yline(-1 -6 -11, ext lp(solid) lc(gs10)) text(-0.5 -180 "RMSPE")
+ylab(-1 "{bf:Quadratic}" -2 "2015" -3 "2016" -4 "2017" -5 "2018" -6 "{bf:Linear}"
+     -7 "2015" -8 "2016" -9 "2017" -10 "2018" -11 "{bf:No Trend}" -12 "2015"
+     -13 "2016" -14 "2017" -15 "2018", nogrid );
+graph export "$GRA/R_3_before.eps", replace;
+#delimit cr
+
+replace x1=-550
+replace l=-550
+replace u=800
+
+#delimit ;
+tw rarea l u orden2, hor color(gs14) fcol(gs14) fi(gs14)
+    || rcap lower2 upper2 orden1 if min==0, hor 
+    || rcap lower2 upper2 orden1 if min==1, hor lc(black)
+    || pci -1 0 -15.5 0, lp(dash) lc(red)
+    || scatter orden1 beta2, ms(C)     
+    || scatter orden1 x1 if beta1!=. , 
+mlabel(RMSE) ms(none) legend(off) ytitle("") xlabel(-400(100)800, nogrid) 
+yticks() yline(-1 -6 -11, ext lp(solid) lc(gs10)) text(-0.5 -480 "RMSPE")
+ylab(-1 "{bf:Quadratic}" -2 "2015" -3 "2016" -4 "2017" -5 "2018" -6 "{bf:Linear}"
+     -7 "2015" -8 "2016" -9 "2017" -10 "2018" -11 "{bf:No Trend}" -12 "2015"
+     -13 "2016" -14 "2017" -15 "2018", nogrid );
+graph export "$GRA/R_3_after.eps", replace;
+#delimit cr
 
 

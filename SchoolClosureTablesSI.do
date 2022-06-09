@@ -1,4 +1,4 @@
-/* SchoolClosureMainResults.do       DanielPailanir        yyyy-mm-dd:2022-06-06
+/* SchoolClosureTablesSI.do         DanielPailanir         yyyy-mm-dd:2022-06-06
 *----|----1----|----2----|----3----|----4----|----5----|----6----|----7----|----8
 	This code is to replicate the Supplementary Information tables:
 	"Schools as a Safety-net: The Impact of School Closures and Reopenings on 
