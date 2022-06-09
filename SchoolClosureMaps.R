@@ -37,7 +37,7 @@ dates = c("05aug2020", "10aug2020", "17aug2020", "24aug2020",
 map1$fday <- factor(map1$fday, levels = dates)
 map2$fday <- factor(map2$fday, levels = dates)
 
-# Map of Chile
+# Figure S1: Map of Chile
 G1 <- ggplot() + geom_sf(data = map1, aes(fill = prop_schools), color = "black") +
       scale_fill_gradient("School Opening", low = 'white', high = 'forestgreen',
                           breaks = c(0, 0.25, 0.5, 0.75, 1)) +
@@ -58,7 +58,7 @@ G1 <- ggplot() + geom_sf(data = map1, aes(fill = prop_schools), color = "black")
 ggsave(G1, file = paste(graphs,"/Chile.pdf", sep = ""), height = 14, 
        width = 17.5, dpi = 350)
 
-# Map of Region Metropolitana
+# Figure S2: Map of Region Metropolitana
 G2 <-  ggplot() + geom_sf(data = map2, aes(fill = prop_schools), color = "black") +
        scale_fill_gradient("School Opening", low = 'white', high = 'forestgreen',
                            breaks = c(0, 0.25, 0.5, 0.75, 1)) +
