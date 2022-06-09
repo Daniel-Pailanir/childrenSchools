@@ -22,7 +22,7 @@ set more off
 *-------------------------------------------------------------------------------
 *Global and some details
 *-------------------------------------------------------------------------------
-global ROOT "C:/Users/danie/OneDrive/Escritorio/Research/SchoolClosureViolence/replication/"
+global ROOT "/SchoolClosureViolence/replication/"
 
 global DAT "$ROOT/data"
 global GRA "$ROOT/results/graphs"
@@ -159,9 +159,462 @@ graph export "$GRA/prop_partesR.pdf", replace;
 #delimit cr
 
 *-------------------------------------------------------------------------------
+*Figure S13
+*-------------------------------------------------------------------------------
+use "$DAT/SchoolClosure_OPD.dta", clear
+gen reporting=Courts+HealthCenters+Schools+Other
+gen sum1=Schools+HealthCenters
+gen sum2=Schools+HealthCenters+Courts
+gen sum3=Schools+HealthCenters+Courts+Other
+
+*percentage of total reporting
+local vari Courts HealthCenters Schools Other
+foreach v of local vari {
+    gen `v'_p=`v'/reporting*100
+}
+keep if Date<=743 //keep until december 2021
+sort Date
+
+#delimit ;
+twoway area Schools Date, color(%50)
+       || rarea Schools sum1 Date, color(%40) 
+	   || rarea sum1 sum2 Date, color(%60)
+	   || rarea sum2 sum3 Date, color(%70)
+	   || line reporting Date, lc(black) lp(solid)
+ytitle("Formal reporting violence") xtitle("")
+xlabel(708(2)743, angle(45)) xline(722 727, lc(red)) 
+legend(order(4 "Others" 3 "Courts" 2 "Health Centers" 1 "Schools") pos(12) col(4));
+graph export "$GRA/OPD1.pdf", replace;
+#delimit cr
+
+gen p_sum1=Schools_p+HealthCenters_p
+gen p_sum2=Schools_p+HealthCenters_p+Courts_p
+gen p_sum3=Schools_p+HealthCenters_p+Courts_p+Other_p
+
+#delimit ;
+twoway area Schools_p Date, color(%50)
+       || rarea Schools_p p_sum1 Date, color(%40) 
+	   || rarea p_sum1 p_sum2 Date, color(%60)
+	   || rarea p_sum2 p_sum3 Date, color(%70)
+ytitle("Percentage of formal reporting violence")
+xtitle("") xlabel(708(2)743, angle(45)) xline(722 727, lc(red)) 
+legend(order(4 "Others" 3 "Courts" 2 "Health Centers" 1 "Schools") pos(12) col(4));
+graph export "$GRA/OPD2.pdf", replace;
+#delimit cr
+
+*-------------------------------------------------------------------------------
 *Figure S14-S15
 *-------------------------------------------------------------------------------
+use $DAT/SchoolClosure_Final.dta, clear
+local cond1 "if year>=2019 [aw=populationyoung]"
+local cond "if year>=2019"
+local opt2 "cluster(comuna) abs(comuna)"
+local indvar1 "SchoolClose2 SchoolOpen_i"
 
+foreach en in V SA R {
+    matrix `en'1=J(36,5,.) //no control
+    matrix `en'2=J(36,5,.) //week/comuna fe
+}
+
+local varr rate rateSA rateV
+foreach v of local varr {
+    if "`v'"=="rate" local en V
+    if "`v'"=="rateSA" local en SA
+    if "`v'"=="rateV" local en R
+    *for outcome mean
+    qui sum `v' if week<=61 & year>=2019 [aw=populationyoung]
+    local `en'_mean=`r(mean)'
+    matrix `en'1[1,5] = `r(mean)'
+    matrix `en'2[1,5] = `r(mean)'
+
+    *(1) no controls
+    qui reg `v' `indvar1' `cond1', cluster(comuna)
+    matrix `en'1[1,1] = _b[SchoolClose2]
+    matrix `en'1[2,1] = _b[SchoolOpen_i]
+    matrix `en'1[1,2] = _b[SchoolClose2] - invttail(e(df_r),0.025)*_se[SchoolClose]
+    matrix `en'1[2,2] = _b[SchoolOpen_i] - invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+    matrix `en'1[1,3] = _b[SchoolClose2] + invttail(e(df_r),0.025)*_se[SchoolClose]
+    matrix `en'1[2,3] = _b[SchoolOpen_i] + invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+    matrix `en'1[1,4] = e(N)
+
+    *(2) week and comuna fe
+    qui areg `v' `indvar1' i.w `cond1', `opt2'
+    matrix `en'2[1,1] = _b[SchoolClose2]
+    matrix `en'2[2,1] = _b[SchoolOpen_i]
+    matrix `en'2[1,2] = _b[SchoolClose2] - invttail(e(df_r),0.025)*_se[SchoolClose]
+    matrix `en'2[2,2] = _b[SchoolOpen_i] - invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+    matrix `en'2[1,3] = _b[SchoolClose2] + invttail(e(df_r),0.025)*_se[SchoolClose]
+    matrix `en'2[2,3] = _b[SchoolOpen_i] + invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+    matrix `en'2[1,4] = e(N)
+}
+
+*-------*
+*By Age
+*-------*
+local varr rate rateSA rateV
+foreach v of local varr {
+    if "`v'"=="rate" local en V
+    if "`v'"=="rateSA" local en SA
+    if "`v'"=="rateV" local en R
+    local j=4
+    local k=5
+    forvalues i=1/5 {
+        *for outcome mean
+        qui sum `v'`i' if week<=61 & year>=2019 [aw=population`i']
+        matrix `en'1[`j',5] = `r(mean)'
+        matrix `en'2[`j',5] = `r(mean)'
+
+        *(1) no controls
+        qui reg `v'`i' `indvar1' `cond' [aw=population`i'], cluster(comuna)
+        matrix `en'1[`j',1] = _b[SchoolClose2]
+        matrix `en'1[`k',1] = _b[SchoolOpen_i]
+        matrix `en'1[`j',2] = _b[SchoolClose2] - invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'1[`k',2] = _b[SchoolOpen_i] - invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'1[`j',3] = _b[SchoolClose2] + invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'1[`k',3] = _b[SchoolOpen_i] + invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'1[`j',4] = e(N)
+
+        *(2) week and comuna fe
+        qui areg `v'`i' `indvar1' i.w `cond' [aw=population`i'], `opt2'
+        matrix `en'2[`j',1] = _b[SchoolClose2]
+        matrix `en'2[`k',1] = _b[SchoolOpen_i]
+        matrix `en'2[`j',2] = _b[SchoolClose2] - invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'2[`k',2] = _b[SchoolOpen_i] - invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'2[`j',3] = _b[SchoolClose2] + invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'2[`k',3] = _b[SchoolOpen_i] + invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'2[`j',4] = e(N)
+		
+        local j=`j'+2
+        local k=`k'+2
+    }
+}
+
+*-------*
+*By Sex
+*-------*
+foreach en in V SA R {
+    if "`en'"=="V"  local depvar rate
+    if "`en'"=="SA" local depvar rateSA
+    if "`en'"=="R"  local depvar rateV
+    local j=15
+    local k=16
+    foreach i in Girls Boys {
+        *for outcome mean
+        qui sum `depvar'`i' if week<=61 & year>=2019 [aw=population`i']
+        matrix `en'1[`j',5] = `r(mean)'
+        matrix `en'2[`j',5] = `r(mean)'
+
+        *(1) no controls
+        qui reg `depvar'`i' `indvar1' `cond' [aw=population`i'], cluster(comuna)
+        matrix `en'1[`j',1] = _b[SchoolClose2]
+        matrix `en'1[`k',1] = _b[SchoolOpen_i]
+        matrix `en'1[`j',2] = _b[SchoolClose2] - invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'1[`k',2] = _b[SchoolOpen_i] - invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'1[`j',3] = _b[SchoolClose2] + invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'1[`k',3] = _b[SchoolOpen_i] + invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'1[`j',4] = e(N)
+
+        *(2) week and comuna fe
+        qui areg `depvar'`i' `indvar1' i.w `cond' [aw=population`i'], `opt2'
+        matrix `en'2[`j',1] = _b[SchoolClose2]
+        matrix `en'2[`k',1] = _b[SchoolOpen_i]
+        matrix `en'2[`j',2] = _b[SchoolClose2] - invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'2[`k',2] = _b[SchoolOpen_i] - invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'2[`j',3] = _b[SchoolClose2] + invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'2[`k',3] = _b[SchoolOpen_i] + invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'2[`j',4] = e(N)
+		
+        local j=`j'+2
+        local k=`k'+2
+    }
+}
+
+*-----------*
+*Development
+*-----------*
+foreach en in V SA R {
+    if "`en'"=="V"  local depvar rate
+	if "`en'"=="SA" local depvar rateSA
+    if "`en'"=="R"  local depvar rateV
+    local j=20
+    local k=21
+    local rnk A MA M MB B
+    foreach i of local rnk {
+        *local options
+        local cond "if year>=2019 & r_IDC=="`i'" [aw=populationyoung]"
+        *for outcome mean
+        qui sum `depvar' if week<=61 & r_IDC=="`i'" & year>=2019 [aw=populationyoung]
+        matrix `en'1[`j',5] = `r(mean)'
+        matrix `en'2[`j',5] = `r(mean)'
+
+        *(1) no controls
+        qui reg `depvar' `indvar1' `cond', cluster(comuna)
+        matrix `en'1[`j',1] = _b[SchoolClose2]
+        matrix `en'1[`k',1] = _b[SchoolOpen_i]
+        matrix `en'1[`j',2] = _b[SchoolClose2] - invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'1[`k',2] = _b[SchoolOpen_i] - invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'1[`j',3] = _b[SchoolClose2] + invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'1[`k',3] = _b[SchoolOpen_i] + invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'1[`j',4] = e(N)
+		
+        *(2) week and comuna fe
+        qui areg `depvar' `indvar1' i.w `cond', `opt2'
+        matrix `en'2[`j',1] = _b[SchoolClose2]
+        matrix `en'2[`k',1] = _b[SchoolOpen_i]
+        matrix `en'2[`j',2] = _b[SchoolClose2] - invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'2[`k',2] = _b[SchoolOpen_i] - invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'2[`j',3] = _b[SchoolClose2] + invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'2[`k',3] = _b[SchoolOpen_i] + invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'2[`j',4] = e(N)
+		
+        local j=`j'+2
+        local k=`k'+2
+    }
+}
+
+*----------*
+*Quarantine
+*----------*
+gen q=0
+replace q=1 if week>=65 & week<=87
+replace q=2 if week>87
+egen ind=mean(quarantine) if q==0, by(comuna) 
+replace ind=0 if ind==.
+egen ind2=mean(quarantine) if q==1, by(comuna)
+replace ind2=0 if ind2==.
+egen ind3=mean(quarantine) if q==2, by(comuna) 
+replace ind3=0 if ind3==.
+egen c2=mean(ind2), by(comuna) 
+egen c3=mean(ind3), by(comuna) 
+replace c2=1 if c2!=0
+replace c3=2 if c3!=0 & c2!=1
+replace c3=0 if c3!=2
+gen d=c2+c3
+drop q ind*
+la def d 0 "Never" 1 "Early" 2 "Later"
+la val d d
+xtset comuna week
+
+foreach en in V SA R {
+    if "`en'"=="V"  local depvar rate
+	if "`en'"=="SA" local depvar rateSA
+    if "`en'"=="R"  local depvar rateV
+    local j=31
+    local k=32
+    forvalues i=0(1)2 {
+        if "`i'"=="0" local m ind0
+        if "`i'"=="1" local m ind1
+        if "`i'"=="2" local m ind2	
+        *local options
+        local cond "if year>=2019 & d==`i' [aw=populationyoung]"
+        *for outcome mean
+        qui sum `depvar' if week<=61 & d==`i' & year>=2019 [aw=populationyoung]
+        matrix `en'1[`j',5] = `r(mean)'
+        matrix `en'2[`j',5] = `r(mean)'
+		
+        *(1) no controls
+        qui reg `depvar' `indvar1' `cond', cluster(comuna)
+        matrix `en'1[`j',1] = _b[SchoolClose2]
+        matrix `en'1[`k',1] = _b[SchoolOpen_i]
+        matrix `en'1[`j',2] = _b[SchoolClose2] - invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'1[`k',2] = _b[SchoolOpen_i] - invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'1[`j',3] = _b[SchoolClose2] + invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'1[`k',3] = _b[SchoolOpen_i] + invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'1[`j',4] = e(N)
+
+        *(2) week and comuna fe
+        qui areg `depvar' `indvar1' i.w `cond', `opt2'
+        matrix `en'2[`j',1] = _b[SchoolClose2]
+        matrix `en'2[`k',1] = _b[SchoolOpen_i]
+        matrix `en'2[`j',2] = _b[SchoolClose2] - invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'2[`k',2] = _b[SchoolOpen_i] - invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'2[`j',3] = _b[SchoolClose2] + invttail(e(df_r),0.025)*_se[SchoolClose]
+        matrix `en'2[`k',3] = _b[SchoolOpen_i] + invttail(e(df_r),0.025)*_se[SchoolOpen_i]
+        matrix `en'2[`j',4] = e(N)
+		
+        local j=`j'+2
+        local k=`k'+2
+    }
+}
+
+*-----------------------------
+*SCHOOL CLOSURE AND REOPENING
+*-----------------------------
+local j=1
+forvalues i=1/2 {
+    clear
+    svmat V`i'
+    gen gr=1 if V`i'4!=.
+    replace gr=2 if V`i'4==. & V`i'1!=.
+    gen orden=-_n	
+    gen l=-6.2
+    gen u=1
+    gen x1=-6.2
+    gen x2=-5
+    *color in age range
+    gen orden1=-3
+    replace orden1=-14 if orden==-36
+    *color in development range
+    gen orden2=-19
+    replace orden2=-30 if orden==-36
+    format V`i'5 %9.3f
+    gen aux=V`i'4/54250*100  
+    format aux %9.0f
+    gen aux3=" ("
+    gen aux4=")"
+    egen lab=concat(V`i'4 aux3 aux aux4), format(%9.0fc)
+    set obs 37
+    replace orden1=0 in 37
+
+    #delimit ;
+    twoway  rarea l u orden1, hor color(gs14) fcol(gs14) fi(gs14) 
+            || rarea l u orden2, hor color(gs14) fcol(gs14) fi(gs14)
+            || pci 0 0 -36 0, lp(dash) lc(red)
+            || rcap V`i'2 V`i'3 orden if gr==1, hor lc(black)
+            || rcap V`i'2 V`i'3 orden if gr==2, hor lc(blue)
+            || scatter orden V`i'1 if gr==1, mc(black) msym(Dh)
+            || scatter orden V`i'1 if gr==2, mc(blue) msym(O)
+            || scatter orden x1 if V`i'4!=., mlabel(lab) ms(none)
+            || scatter orden x2 if V`i'4!=., mlabel(V`i'5) ms(none)
+    text(0.7   -5.8 "{bf:Observations (%)}", size(.25cm))
+    text(0.7   -4.6 "{bf:Baseline rate}", size(.25cm))
+    text(-2.9  -6.7 "{bf:Age Group}", size(.22cm))
+    text(-13.9  -6.6 "{bf:Sex}", size(.22cm))
+    text(-18.9 -6.8 "{bf:Development}", size(.22cm))
+    text(-29.9 -6.7 "{bf:Quarantine}", size(.22cm))	
+    text(-41   -1.5 "Change in reporting per 100,000 children", size(.36cm))	
+    ylab(-1  "{bf:Overall}"     -4  "   [1-6]" 
+         -6  "   [7-10]"        -8  "   [11-13]" 
+         -10  "   [14-15]"      -12  "   [16-17]"
+         -15  "Female"          -17 "Male"
+         -20 "High"             -22 "Medium-High"
+         -24 "Medium"           -26 "Medium-Low"
+         -28 "Low"              -31 "Never"
+         -33 "Early Quarantine" -35 "Later Quarantine", labsize(vsmall) nogrid) 
+    xlabel(-4(1)1, nogrid format(%9.1f)) yticks() yline(0, ext lp(solid) lc(gs10))
+    xtitle("") ytitle("") legend(order(6 "School Closure" 7 "School Reopening") pos(1) col(2)); 
+    graph export "$GRA/SchoolsClose_`j'_both.eps", replace;
+    #delimit cr
+    local ++j
+}
+
+*SEXUAL ABUSE
+local j=1
+forvalues i=1/2 {
+    clear
+    svmat SA`i'
+    gen gr=1 if SA`i'4!=.
+    replace gr=2 if SA`i'4==. & SA`i'1!=.
+    gen orden=-_n	
+    gen l=-5.2
+    gen u=2
+    gen x1=-5.2
+    gen x2=-3.8
+    *color in age range
+    gen orden1=-3
+    replace orden1=-14 if orden==-36
+    *color in development range
+    gen orden2=-19
+    replace orden2=-30 if orden==-36
+    format SA`i'5 %9.3f
+    gen aux=SA`i'4/53215*100  
+    format aux %9.0f
+    gen aux3=" ("
+    gen aux4=")"
+    egen lab=concat(SA`i'4 aux3 aux aux4), format(%9.0fc)
+    set obs 37
+    replace orden1=0 in 37
+	
+    #delimit ;
+    twoway  rarea l u orden1, hor color(gs14) fcol(gs14) fi(gs14) 
+            || rarea l u orden2, hor color(gs14) fcol(gs14) fi(gs14)
+            || pci 0 0 -36 0, lp(dash) lc(red)
+            || rcap SA`i'2 SA`i'3 orden if gr==1, hor lc(black)
+            || rcap SA`i'2 SA`i'3 orden if gr==2, hor lc(blue)
+            || scatter orden SA`i'1 if gr==1, mc(black) msym(Dh)
+            || scatter orden SA`i'1 if gr==2, mc(blue) msym(O)
+            || scatter orden x1 if SA`i'4!=., mlabel(lab) ms(none)
+            || scatter orden x2 if SA`i'4!=., mlabel(SA`i'5) ms(none)
+    text(0.7   -4.8 "{bf:Observations (%)}", size(.25cm))
+    text(0.7   -3.5 "{bf:Baseline rate}", size(.25cm))
+    text(-2.9  -5.7 "{bf:Age Group}", size(.22cm))
+    text(-13.9  -5.6 "{bf:Sex}", size(.22cm))
+    text(-18.9 -5.8 "{bf:Development}", size(.22cm))
+    text(-29.9 -5.7 "{bf:Quarantine}", size(.22cm))	
+    text(-41   -0.5 "Change in reporting per 100,000 children", size(.36cm))	
+    ylab(-1  "{bf:Overall}"     -4  "   [1-6]" 
+         -6  "   [7-10]"        -8  "   [11-13]" 
+         -10  "   [14-15]"      -12  "   [16-17]"
+         -15  "Female"          -17 "Male"
+         -20 "High"             -22 "Medium-High"
+         -24 "Medium"           -26 "Medium-Low"
+         -28 "Low"              -31 "Never"
+         -33 "Early Quarantine" -35 "Later Quarantine", labsize(vsmall) nogrid) 
+    xlabel(-3(1)2, nogrid format(%9.1f)) yticks() yline(0, ext lp(solid) lc(gs10))
+    xtitle("") ytitle("") legend(order(6 "School Closure" 7 "School Reopening") pos(1) col(2)); 
+    graph export "$GRA/SchoolsClose_`j'_SA_both.eps", replace;
+    #delimit cr
+    local ++j
+}
+
+*RAPE
+local j=1
+forvalues i=1/2 {
+    clear
+    svmat R`i'
+    gen gr=1 if R`i'4!=.
+    replace gr=2 if R`i'4==. & R`i'1!=.
+    gen orden=-_n	
+    gen l=-1.7
+    gen u=0.5
+    gen x1=-1.7
+    gen x2=-1.3
+    *color in age range
+    gen orden1=-3
+    replace orden1=-14 if orden==-36
+    *color in development range
+    gen orden2=-19
+    replace orden2=-30 if orden==-36
+    format R`i'5 %9.3f
+    gen aux=R`i'4/53215*100  
+    format aux %9.0f
+    gen aux3=" ("
+    gen aux4=")"
+    egen lab=concat(R`i'4 aux3 aux aux4), format(%9.0fc)
+    set obs 37
+    replace orden1=0 in 37
+	
+    #delimit ;
+    twoway  rarea l u orden1, hor color(gs14) fcol(gs14) fi(gs14) 
+            || rarea l u orden2, hor color(gs14) fcol(gs14) fi(gs14)
+            || pci 0 0 -36 0, lp(dash) lc(red)
+            || rcap R`i'2 R`i'3  orden if gr==1, hor lc(black)
+            || rcap R`i'2 R`i'3 orden if gr==2, hor lc(blue)
+            || scatter orden R`i'1 if gr==1, mc(black) msym(Dh)
+            || scatter orden R`i'1 if gr==2, mc(blue) msym(O)
+            || scatter orden x1 if R`i'4!=., mlabel(lab) ms(none)
+            || scatter orden x2 if R`i'4!=., mlabel(R`i'5) ms(none)
+    text(0.7   -1.6 "{bf:Observations (%)}", size(.25cm))
+    text(0.7   -1.2 "{bf:Baseline rate}", size(.25cm))
+    text(-2.9  -1.86 "{bf:Age Group}", size(.22cm))
+    text(-13.9  -1.85 "{bf:Sex}", size(.22cm))
+    text(-18.9 -1.89 "{bf:Development}", size(.22cm))
+    text(-29.9 -1.86 "{bf:Quarantine}", size(.22cm))	
+    text(-41   -0.25 "Change in reporting per 100,000 children", size(.36cm))	
+    ylab(-1  "{bf:Overall}"     -4  "   [1-6]" 
+         -6  "   [7-10]"        -8  "   [11-13]" 
+         -10  "   [14-15]"      -12  "   [16-17]"
+         -15  "Female"          -17 "Male"
+         -20 "High"             -22 "Medium-High"
+         -24 "Medium"           -26 "Medium-Low"
+         -28 "Low"              -31 "Never"
+         -33 "Early Quarantine" -35 "Later Quarantine", labsize(vsmall) nogrid)  
+    xlabel(-1(0.5)0.5, nogrid format(%9.1f)) yticks() yline(0, ext lp(solid) lc(gs10))
+    xtitle("") ytitle("") legend(order(6 "School Closure" 7 "School Reopening") pos(1) col(2)); 
+    graph export "$GRA/SchoolsClose_`j'_R_both.eps", replace;
+    #delimit cr
+    local ++j
+}
 
 *-------------------------------------------------------------------------------
 *Figure S16-S17: Attendance
@@ -216,8 +669,19 @@ legend(order(1 "Primary" "(2,068)" 2 "Secondary" "    (538)"
 			 4 "{&le}Secondary" "     (2,028)") pos(12) col(4));
 graph export "$GRA/kden_bylvl.eps", replace;
 #delimit cr
+
+
 *-------------------------------------------------------------------------------
 *Figure S18
+*-------------------------------------------------------------------------------
+
+
+
+*-------------------------------------------------------------------------------
+*Figure S19-S23
+*-------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------
+*Figure S24-S25
 *-------------------------------------------------------------------------------
 
 
