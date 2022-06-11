@@ -10,5 +10,6 @@ Replication materials for Schools as a Safety-net: The Impact of School Closures
      ├─ SchoolClosureMainResults.do: to replicate the main results
      ├─ SchoolClosureTablesSI.do: to replicate the results of the SI tables
      ├─ SchoolClosureMaps.R: to replicate SI maps
-     └─ SchoolClosureGraphs.do: to replicate the SI graphs
+     ├─ SchoolClosureGraphs.do: to replicate the SI graphs
+     └─ SchoolClosureCounterfactual.do: to replicate the SI counterfactuals
 ```
