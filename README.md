@@ -1,5 +1,5 @@
 # childrenSchools
-Replication materials for Schools as a Safety-net: The Impact of School Closures and Reopenings on Rates of Reporting of Violence Against Children ([Damian Clarke](https://github.com/damiancclarke), Pilar Larroulet, Daniel Pailañir & Daniela Quintana)
+Replication materials for [Schools as a Safety-net: The Impact of School Closures and Reopenings on Rates of Reporting of Violence Against Children](https://arxiv.org/abs/2206.14612) ([Damian Clarke](https://github.com/damiancclarke), Pilar Larroulet, Daniel Pailañir & Daniela Quintana)
 
 ```bash
 └─ MAIN FOLDER
